@@ -18,19 +18,40 @@ async def main():
     await statistic.get_messages()
 
     try:
-        groups = statistic.get_groups()
+        try:
+            groups = statistic.get_groups()
+
+        except Exception as ex:
+            logger.error(f"Failed to get groups: {ex}")
+            return
 
         for group in groups:
-            posts = statistic.get_posts(group.get("telegram_id"))
-            views = []
+            try:
+                posts = statistic.get_posts(group.get("telegram_id"))
 
+            except Exception as ex:
+                logger.error(f"Error while getting posts for group {group.get('telegram_id')}: {ex}")
+                continue
+
+            views = []
             for post in posts:
-                views.append(await statistic.get_post_views(post))
+                try:
+                    views.append(await statistic.get_post_views(post))
+
+                except Exception as ex:
+                    logger.error(f"Error while getting views for post {post.get('id')}: {ex}")
 
             average_post_views = int(sum(views) / len(views))
             logger.info(f"Average post views in group {group.get('telegram_id')}: {average_post_views} views")
 
-            statistic.set_average_post_views(group.get("id"), average_post_views)
+            try:
+                statistic.set_average_post_views(group.get("id"), average_post_views)
+
+            except Exception as ex:
+                logger.error(f"Error while setting average views for group {group.get('telegram_id')}: {ex}")
+
+    except Exception as ex:
+        logger.error(f"Error: {ex}")
 
     finally:
         await statistic.stop_bot()
