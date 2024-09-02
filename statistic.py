@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import requests
@@ -76,10 +77,11 @@ class Statistic:
         return groups_telegram_ids
 
     @staticmethod
-    def get_full_posts(group_telegram_id: int):
+    def get_full_posts(group_telegram_id: int, date: datetime.date):
         restrict = {
             "groupTelegramId": group_telegram_id,
-            "status": PostStatus.PUBLISHED.value
+            "status": PostStatus.PUBLISHED.value,
+            "publishDate": date.strftime("%Y-%m-%d")
         }
 
         response = requests.get(Endpoint.POST.value, params={"restrict": json.dumps(restrict)})
@@ -117,7 +119,11 @@ class Statistic:
         return posts_message_ids
 
     def get_posts(self, group_id: int):
-        full_posts = self.get_full_posts(group_id)
+        full_posts = []
+        today_date = datetime.date.today()
+        for i in range(1, 31):
+            date = today_date - datetime.timedelta(days=i)
+            full_posts.extend(self.get_full_posts(group_id, date))
         posts_message_ids = self.get_posts_message_ids(full_posts)
         return posts_message_ids
 
