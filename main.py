@@ -14,7 +14,7 @@ logger = logging.getLogger()
 async def main():
     while True:
         date = datetime.now()
-        if date.weekday() != 6:
+        if date.weekday() != 6 and False:
             logger.debug("It's not Sunday")
             await asyncio.sleep(60 * 60)
 
