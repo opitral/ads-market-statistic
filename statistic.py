@@ -125,7 +125,7 @@ class Statistic:
             date = today_date - datetime.timedelta(days=i)
             full_posts.extend(self.get_full_posts(group_id, date))
         posts_message_ids = self.get_posts_message_ids(full_posts)
-        return posts_message_ids
+        return set(posts_message_ids)
 
     async def get_post_views(self, message_id: int):
         message = await self.bot.get_messages(self.GENERAL_CHANNEL_TELEGRAM_ID, message_id)
